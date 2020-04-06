@@ -36,9 +36,13 @@ class MainActivity : AppCompatActivity(), SelectMediaListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // initialize db
         db = DatabaseClient.accessDb(this)
         db.mediaTrackDao().listAll().observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io())
                     .subscribe({ tracks  ->
+                        /**
+                         * Check if the tracks are already loaded in the DB, if not load it from the internet
+                         */
                         if ( tracks.isEmpty() ){
                             loadFromInternet()
                         }else{
@@ -50,6 +54,9 @@ class MainActivity : AppCompatActivity(), SelectMediaListener {
 
     }
 
+    /**
+     * load the data from the internet, i.e. itunes.apple.com
+     */
     private fun loadFromInternet(){
         val api = NetworkClient.createRxService(Api::class.java)
         val params = HashMap<String, String>()
@@ -78,7 +85,9 @@ class MainActivity : AppCompatActivity(), SelectMediaListener {
                     }
                     mediaTracks.add(media)
                 }
+                // save to database so that next load, it will just get the data from the DB
                 saveToDatabase(mediaTracks)
+                // display the results on RecyclerView
                 runOnUiThread {
                     displayMedias(mediaTracks)
                     progress_loading.visibility = View.GONE
@@ -89,6 +98,9 @@ class MainActivity : AppCompatActivity(), SelectMediaListener {
             })
     }
 
+    /**
+     * Save tracks to DB
+     */
     private fun saveToDatabase(tracks: List<MediaTrack>){
         Completable.fromAction {
             db.mediaTrackDao().insert(tracks)
@@ -99,6 +111,9 @@ class MainActivity : AppCompatActivity(), SelectMediaListener {
                     })
     }
 
+    /**
+     * Display to the RecyclerView
+     */
     private fun displayMedias(tracks: List<MediaTrack>){
         val groupAdapter = GroupAdapter<GroupieViewHolder>()
         groupAdapter.clear()
@@ -108,6 +123,10 @@ class MainActivity : AppCompatActivity(), SelectMediaListener {
         rv_media_tracks.adapter = groupAdapter
     }
 
+    /**
+     * Display the details on the selected track and/or movie
+     * Serialize the @MediaTrack object to pass to the details activity
+     */
     override fun onSelectedMedia(track: MediaTrack) {
         val movie = Gson().toJson(track)
         val detailIntent = Intent(this, DetailsActivity::class.java)
@@ -116,9 +135,16 @@ class MainActivity : AppCompatActivity(), SelectMediaListener {
     }
 }
 
+/**
+ * listener for click
+ */
 interface SelectMediaListener {
     fun onSelectedMedia(track: MediaTrack)
 }
+
+/**
+ * Item for the RecyclerView
+ */
 class MediaTrackItem(val track: MediaTrack, val listener: SelectMediaListener) : Item<GroupieViewHolder>() {
     override fun getLayout() = R.layout.media_track_item
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {

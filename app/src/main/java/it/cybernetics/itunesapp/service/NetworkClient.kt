@@ -16,6 +16,9 @@ class NetworkClient {
         // production endpoint
         val BASE_URL = "https://itunes.apple.com/"
 
+        /**
+         * Retrofit 2 service to create an Api object
+         */
         fun <T> createRxService(clazz: Class<T>): T {
 
             val builder = Retrofit.Builder()
