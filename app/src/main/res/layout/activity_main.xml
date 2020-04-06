@@ -7,11 +7,19 @@
     android:padding="10dp"
     tools:context=".MainActivity">
 
+    <TextView
+        android:id="@+id/tv_last_access"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:visibility="gone"
+        android:textColor="@android:color/black" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_media_tracks"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_last_access"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
     <ProgressBar

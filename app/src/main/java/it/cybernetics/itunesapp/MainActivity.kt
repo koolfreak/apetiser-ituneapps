@@ -23,6 +23,9 @@ import it.cybernetics.itunesapp.service.Api
 import it.cybernetics.itunesapp.service.NetworkClient
 import kotlinx.android.synthetic.main.activity_main.*
 import org.json.JSONObject
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 class MainActivity : AppCompatActivity(), SelectMediaListener {
 
@@ -42,6 +45,7 @@ class MainActivity : AppCompatActivity(), SelectMediaListener {
                     .subscribe({ tracks  ->
                         /**
                          * Check if the tracks are already loaded in the DB, if not load it from the internet
+                         * then save it to the DB
                          */
                         if ( tracks.isEmpty() ){
                             loadFromInternet()
@@ -52,6 +56,17 @@ class MainActivity : AppCompatActivity(), SelectMediaListener {
                         Toast.makeText(applicationContext,"Something went wrong...\n${it.localizedMessage}", Toast.LENGTH_LONG).show()
                     })
 
+        var lastAccess = Utils.readPrefs(this, Utils.LAST_ACCESS)
+        if(lastAccess == null){
+            lastAccess = Utils.formatDate(Date(), Utils.DATE_PATTERN_1)
+            Utils.writePrefsString(this, Utils.LAST_ACCESS, lastAccess)
+            tv_last_access.visibility = View.GONE
+        }else{
+            val newlastAccess = Utils.formatDate(Date(), Utils.DATE_PATTERN_1)
+            Utils.writePrefsString(this, Utils.LAST_ACCESS, newlastAccess)
+            tv_last_access.text = "Last accessed: $lastAccess"
+            tv_last_access.visibility = View.VISIBLE
+        }
     }
 
     /**
