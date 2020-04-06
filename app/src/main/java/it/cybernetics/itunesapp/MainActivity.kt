@@ -1,13 +1,16 @@
 package it.cybernetics.itunesapp
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.cardview.widget.CardView
 import coil.api.load
 import coil.transform.CircleCropTransformation
+import com.google.gson.Gson
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
@@ -21,7 +24,7 @@ import it.cybernetics.itunesapp.service.NetworkClient
 import kotlinx.android.synthetic.main.activity_main.*
 import org.json.JSONObject
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), SelectMediaListener {
 
     companion object {
         const val TAG = "MainActivity"
@@ -91,7 +94,6 @@ class MainActivity : AppCompatActivity() {
             db.mediaTrackDao().insert(tracks)
         }.observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io())
                     .subscribe({
-
                     },{
                         Toast.makeText(applicationContext,"Something went wrong...\n${it.localizedMessage}", Toast.LENGTH_LONG).show()
                     })
@@ -100,19 +102,27 @@ class MainActivity : AppCompatActivity() {
     private fun displayMedias(tracks: List<MediaTrack>){
         val groupAdapter = GroupAdapter<GroupieViewHolder>()
         groupAdapter.clear()
-        tracks.forEach {
-            groupAdapter.add( MediaTrackItem(it) )
+        tracks.forEach {track ->
+            groupAdapter.add( MediaTrackItem(track, this@MainActivity) )
         }
         rv_media_tracks.adapter = groupAdapter
+    }
+
+    override fun onSelectedMedia(track: MediaTrack) {
+        val movie = Gson().toJson(track)
+        val detailIntent = Intent(this, DetailsActivity::class.java)
+        detailIntent.putExtra("selected_movie", movie)
+        startActivity(detailIntent)
     }
 }
 
 interface SelectMediaListener {
     fun onSelectedMedia(track: MediaTrack)
 }
-class MediaTrackItem(val track: MediaTrack) : Item<GroupieViewHolder>() {
+class MediaTrackItem(val track: MediaTrack, val listener: SelectMediaListener) : Item<GroupieViewHolder>() {
     override fun getLayout() = R.layout.media_track_item
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
+        val layoutView = viewHolder.itemView.findViewById<CardView>(R.id.cv_media_item_layout)
         val image = viewHolder.itemView.findViewById<ImageView>(R.id.iv_media_image)
         val name = viewHolder.itemView.findViewById<TextView>(R.id.tv_media_track_name)
         val genre = viewHolder.itemView.findViewById<TextView>(R.id.tv_media_track_genre)
@@ -126,6 +136,9 @@ class MediaTrackItem(val track: MediaTrack) : Item<GroupieViewHolder>() {
         name.text = track.trackName
         genre.text = "Genre: ${track.primaryGenreName}"
         price.text = "Price: ${track.collectionPrice}"
+        layoutView.setOnClickListener {
+            listener.onSelectedMedia(track)
+        }
     }
 
 }

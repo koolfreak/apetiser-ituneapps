@@ -1,5 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp">
+
+    <ImageView
+        android:id="@+id/iv_details_image"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_centerHorizontal="true" />
+
+
+    <LinearLayout
+        android:layout_below="@+id/iv_details_image"
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_media_track_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Star Trek"
+            android:textColor="@android:color/black"
+            android:textSize="17sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/tv_media_track_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Price: 19.4"
+            android:textColor="@android:color/black"
+            android:textSize="17sp" />
+
+        <TextView
+            android:id="@+id/tv_media_track_genre"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Genre: SciFi"
+            android:textColor="@android:color/black"
+            android:textSize="17sp"/>
+
+
+        <TextView
+            android:layout_marginTop="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Description"
+            android:textColor="@android:color/black" />
+
+
+        <TextView
+            android:id="@+id/tv_media_track_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black" />
+
+        <Button
+            android:id="@+id/btn_close_details"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="Close" />
+
+    </LinearLayout>
+
 
 </RelativeLayout>
